@@ -1,0 +1,143 @@
+<html>
+<head>
+    <title>写真から料理の名前を推測します、カロリーも算出します。（嘘）</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.1/css/bulma.css">
+</head>
+<body>
+    <div id="app">
+        <div>
+            <section class="hero is-medium is-primary is-bold">
+                <div class="hero-body">
+                    <div class="container">
+                        <h1 class="title">
+                            写真をアップロードしてカロリー計算をしよう！（ジョークアプリです）
+                        </h1>
+                        <h2 class="subtitle">
+                            <a href="https://twitter.com/Yametaro1983/status/1243902862133846018" target="_blank">発案者は「無職やめ太郎」さんです</a>
+                        </h2>
+                    </div>
+                </div>
+            </section>
+            <section style="margin: 30px;text-align: center;">
+                <label class="is-primary button" v-if="!image">
+                    写真を選択
+                    <input type="file" style="display: none" @change="setImage">
+                </label>
+                <div v-if="image && !result">
+                    <div class="loader">Loading...</div>
+
+                    <progress class="progress is-primary" :value="progress" max="100">{{progress}}</progress>
+                    <p>{{step}}</p>
+                </div>
+                <div v-if="result">
+                    <img :src="image" style="width: 50%">
+                    <p>アップロードされた料理は「{{result}}」です。</p>
+                    <p>ほぼ野菜なので実質カロリー0です</p>
+                </div>
+            </section>
+        </div>
+    </div>
+    <style>
+        .loader,
+        .loader:after {
+            border-radius: 50%;
+            width: 10em;
+            height: 10em;
+        }
+        .loader {
+            margin: 60px auto;
+            font-size: 10px;
+            position: relative;
+            text-indent: -9999em;
+            border-top: 1.1em solid rgba(30,197,193, 0.2);
+            border-right: 1.1em solid rgba(30,197,193, 0.2);
+            border-bottom: 1.1em solid rgba(30,197,193, 0.2);
+            border-left: 1.1em solid #1ec5c1;
+            -webkit-transform: translateZ(0);
+            -ms-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-animation: load8 1.1s infinite linear;
+            animation: load8 1.1s infinite linear;
+        }
+        @-webkit-keyframes load8 {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+        @keyframes load8 {
+            0% {
+                -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script>
+        vm = new Vue({
+            el: "#app",
+            data: {
+                image: null,
+                result:null,
+                step:'',
+                progress:0,
+
+            },
+            methods: {
+                setImage(e){
+                    let files = e.target.files;
+                    if(files[0]) {
+                        let reader = new FileReader();
+
+                        // Closure to capture the file information.
+                        reader.onload =  function (e) {
+                            vm.image = e.target.result;
+                            let timer = setInterval(function () {
+                                vm.progress+= (Math.random()*10 % 10)+10;
+
+                                if (vm.progress <= 100) {
+                                    vm.step = '結果集計中';
+                                }
+                                if (vm.progress <= 66) {
+                                    vm.step = 'カロリー計算中';
+                                }
+                                if (vm.progress <= 33) {
+                                    vm.step = '画像解析中';
+                                }
+
+
+                                if (vm.progress >= 100) {
+                                    clearInterval(timer);
+                                    vm.progress =100;
+                                    vm.result = 'サラダ';
+                                }
+
+                            }, 1000)
+
+                        }
+
+                        // Read in the image file as a data URL.
+                        reader.readAsDataURL(files[0]);
+
+                    }
+
+                }
+            },
+            mounted(){
+                //表示後にやりたいことはここに書ける
+            }
+        })
+    </script>
+</body>
+</html>
